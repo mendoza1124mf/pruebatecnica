@@ -88,7 +88,7 @@ CREATE TABLE compliance_checks (
 
 ```
 
-## MongoDB
+# MongoDB
 Ejecutar
 ```
 docker exec -it mongo_bd  mongosh
@@ -113,3 +113,6 @@ db.processing_events.insertOne({
 ```
 
 
+# MINIO
+Ingresar a: ```http://localhost:9001``` con las credenciales ```admin:admin123```
+Crear un Bucket con nomre: ```documentos```
