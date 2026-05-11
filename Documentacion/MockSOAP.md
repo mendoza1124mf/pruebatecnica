@@ -51,13 +51,13 @@
 ### Evidencia
 
 * financial_report
-![Financial_report_SOAP](/Documentacion/img_financial_report_SOAP.png)
+![Financial_report_SOAP](./Imagenes/img_financial_report_SOAP.png)
 
 * tax_filing 
-![tax_filing_SOAP](/Documentacion/img_tax_filing.png)
+![tax_filing_SOAP](./Imagenes/img_tax_filing.png)
 
 * regulatory_disclosure
-![regulatory_disclosure_SOAP](/Documentacion/regulatory_disclosure_SOAP.png)
+![regulatory_disclosure_SOAP](./Imagenes/regulatory_disclosure_SOAP.png)
 
 * Otro valor
-![valor_erroneo](/Documentacion/img_valor_erroneo_SOAP.png)
+![valor_erroneo](./Imagenes/img_valor_erroneo_SOAP.png)

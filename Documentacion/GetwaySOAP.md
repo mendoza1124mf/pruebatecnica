@@ -11,7 +11,7 @@
 }
 ```
 
-![alt text](image-2.png)
+![alt text](./Imagenes/gateway_health.png)
 
 ## POST /Compilance_check
 ### URL: http://localhost:8001/api/v1/compliance/check
@@ -34,7 +34,7 @@
     "Status":"COMPLIANT"
 }
 ```
-![alt text](image-1.png)
+![alt text](./Imagenes/gateway_compilance.png)
 
 
 ## GET /compilance/status
@@ -52,4 +52,4 @@
 }
 ```
 
-![alt text](image.png)
+![alt text](./Imagenes/gateway_status.png)
