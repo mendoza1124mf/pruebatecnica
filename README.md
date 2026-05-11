@@ -27,8 +27,9 @@
 ```
 
 ## Documentación por servicio
-[MOCK SOAP](/Documentacion/MockSOAP.md)
-[GATEWAY SOAP](/Documentacion/GetwaySOAP.md)
+* [MOCK SOAP](/Documentacion/MockSOAP.md)
+* [GATEWAY SOAP](/Documentacion/GetwaySOAP.md)
+* [Fast API](/Documentacion/FastAPI.md)
 
 
 ## Instrucciones para inicializar
