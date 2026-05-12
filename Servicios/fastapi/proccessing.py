@@ -6,6 +6,7 @@ from minio import Minio
 from io import BytesIO
 
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from config import MINIO_BUCKET, MINIO_ENDPOINT, MINIO_ACCESS_KEY,MINIO_SECRET_KEY, SOAP_GATEWAY, DATABASE_URL
 
@@ -17,6 +18,18 @@ minio_client = Minio(
 )
 
 app = FastAPI(title="FastAPI Document Processing", version="1.0.0")
+
+origins = [
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post("/api/v1/documents/upload", status_code=201)
 async def subir_documento(

@@ -1,0 +1,138 @@
+.table-wrapper {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.documents-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.documents-table thead {
+  background:#505F76;
+  color: white;
+}
+
+.documents-table th {
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.85rem;
+}
+
+.documents-table tbody tr {
+  border-bottom: 1px solid #e0e0e0;
+  transition: background-color 0.2s ease;
+}
+
+.documents-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.documents-table td {
+  padding: 14px 16px;
+}
+
+.filename {
+  font-weight: 500;
+  color: #333;
+}
+
+.file-icon {
+  margin-right: 8px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.badge-type {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.badge-status {
+  font-weight: 600;
+}
+
+.badge-uploaded {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.badge-processed {
+  background: #e8f5e9;
+  color: #388e3c;
+}
+
+.date {
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.actions {
+  text-align: center;
+}
+
+.btn-action {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+.btn-process {
+  background:  #05297A;
+  color: white;
+}
+
+.btn-process:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-compliance {
+  background:  #748DE1;
+  color: white;
+}
+
+.btn-compliance:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.processing {
+  color: #f57c00;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+
+@media (max-width: 768px) {
+  .documents-table {
+    font-size: 0.85rem;
+  }
+
+  .documents-table th,
+  .documents-table td {
+    padding: 10px 12px;
+  }
+
+  .btn-action {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
+}

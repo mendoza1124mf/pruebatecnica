@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compliance Dashboard</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .panel h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .document-list {
+            list-style: none;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .document-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #f5f5f5;
+            border-left: 4px solid #667eea;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .document-item:hover {
+            background: #e8e8f0;
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .document-item.active {
+            background: #667eea;
+            color: white;
+            border-left-color: #764ba2;
+        }
+
+        .document-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .document-meta {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .compliance-detail {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .compliance-detail.empty {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+        }
+
+        .compliance-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .compliance-stat:last-child {
+            border-bottom: none;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .status-compliant {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-non-compliant {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-unknown {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .notifications {
+            grid-column: 1 / -1;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .notification-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            border-radius: 4px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .notification-item.error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .timestamp {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Compliance Dashboard</h1>
+
+        <div class="grid">
+            <!-- Panel de Documentos -->
+            <div class="panel">
+                <h2>📄 Documentos</h2>
+                <ul class="document-list" id="documentList">
+                    <li class="loading"><div class="spinner"></div>Cargando...</li>
+                </ul>
+            </div>
+
+            <!-- Panel de Detalles de Compliance -->
+            <div class="panel">
+                <h2>✅ Compliance Status</h2>
+                <div id="complianceDetail" class="compliance-detail empty">
+                    <p>Selecciona un documento para ver su estado de compliance</p>
+                </div>
+            </div>
+
+            <!-- Panel de Notificaciones -->
+            <div class="notifications">
+                <h2>🔔 Notificaciones en Vivo</h2>
+                <div id="notificationsList">
+                    <p style="color: #999; text-align: center;">Esperando eventos...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io("http://localhost:4000");
+        let selectedDocumentId = null;
+
+        // ── Socket.IO Events ────────────────────────────────────────────
+        socket.on("connect", () => {
+            console.log("✅ Conectado al BFF");
+            addNotification("Conectado al servicio de notificaciones", "success");
+        });
+
+        socket.on("disconnect", () => {
+            console.log("❌ Desconectado del BFF");
+            addNotification("Desconectado del servicio", "error");
+        });
+
+        socket.on("documento_procesado", (data) => {
+            const status = data.compliance?.status || "UNKNOWN";
+            const message = `Documento ${data.document_id.substring(0, 8)}... procesado: ${status}`;
+            addNotification(message, status === "COMPLIANT" ? "success" : "error");
+
+            // Si el documento seleccionado fue procesado, recargar su compliance
+            if (selectedDocumentId === data.document_id) {
+                loadDocumentCompliance(data.document_id);
+            }
+
+            // Recargar lista de documentos
+            loadDocuments();
+        });
+
+        // ── Functions ────────────────────────────────────────────────────
+
+        async function loadDocuments() {
+            try {
+                const response = await fetch("http://localhost:4000/api/v1/dashboard/summary");
+                const data = await response.json();
+
+                const listHtml = data.items
+                    .map(
+                        (doc) => `
+                    <li class="document-item ${selectedDocumentId === doc.id ? 'active' : ''}" 
+                        onclick="selectDocument('${doc.id}')">
+                        <div class="document-name">${doc.filename}</div>
+                        <div class="document-meta">
+                            Tipo: ${doc.document_type} | 
+                            Estado: ${doc.status}
+                        </div>
+                    </li>
+                `
+                    )
+                    .join("");
+
+                document.getElementById("documentList").innerHTML =
+                    listHtml || '<li class="loading">No hay documentos</li>';
+            } catch (error) {
+                document.getElementById("documentList").innerHTML =
+                    `<li class="loading"><span class="error-message">${error.message}</span></li>`;
+            }
+        }
+
+        async function selectDocument(documentId) {
+            selectedDocumentId = documentId;
+
+           
+            document.querySelectorAll(".document-item").forEach((el) => {
+                el.classList.remove("active");
+            });
+            event.target.closest(".document-item").classList.add("active");
+
+           
+            await loadDocumentCompliance(documentId);
+        }
+
+        async function loadDocumentCompliance(documentId) {
+            try {
+                const detailDiv = document.getElementById("complianceDetail");
+                detailDiv.innerHTML = `<div class="loading"><div class="spinner"></div>Cargando...</div>`;
+
+                const response = await fetch(
+                    `http://localhost:4000/api/v1/documents/${documentId}/compliance`
+                );
+
+                if (!response.ok) {
+                    throw new Error("No hay compliance status para este documento");
+                }
+
+                const data = await response.json();
+                const status = data.status || "UNKNOWN";
+
+                let statusClass = "status-unknown";
+                if (status === "COMPLIANT") statusClass = "status-compliant";
+                else if (status === "NON_COMPLIANT") statusClass = "status-non-compliant";
+
+                detailDiv.innerHTML = `
+                    <div class="compliance-stat">
+                        <span>Status:</span>
+                        <span class="stat-value">${status}</span>
+                    </div>
+                    <div class="compliance-stat">
+                        <span>Check ID:</span>
+                        <span class="stat-value">${data.check_id || "—"}</span>
+                    </div>
+                    <div class="compliance-stat">
+                        <span>Detalles:</span>
+                        <span class="stat-value">${data.details || "—"}</span>
+                    </div>
+                    <div class="compliance-stat">
+                        <span>Verificado:</span>
+                        <span class="stat-value">${new Date(data.checked_at).toLocaleString() || "—"}</span>
+                    </div>
+                    <div>
+                        <span class="status-badge ${statusClass}">${status}</span>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById("complianceDetail").innerHTML =
+                    `<div class="error-message">${error.message}</div>`;
+            }
+        }
+
+        function addNotification(message, type = "success") {
+            const container = document.getElementById("notificationsList");
+
+            if (container.children[0]?.textContent.includes("Esperando")) {
+                container.innerHTML = "";
+            }
+
+            const item = document.createElement("div");
+            item.className = `notification-item ${type === "success" ? "" : "error"}`;
+            item.innerHTML = `
+                <div>${message}</div>
+                <div class="timestamp">${new Date().toLocaleTimeString()}</div>
+            `;
+
+            container.insertBefore(item, container.firstChild);
+
+            while (container.children.length > 10) {
+                container.removeChild(container.lastChild);
+            }
+        }
+
+        loadDocuments();
+
+        setInterval(loadDocuments, 10000);
+    </script>
+</body>
+</html>

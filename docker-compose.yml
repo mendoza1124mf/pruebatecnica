@@ -54,6 +54,29 @@ services:
     ports:
       - "8000:8000"
 
+  notificaciones:
+    build: ./Notificaciones
+    container_name: notificaciones
+    ports:
+      - "4000:4000"
+    depends_on:
+      - fastapi
+      - gateway
+    environment:
+      - FASTAPI_URL=http://fastapi:8000
+      - GATEWAY_URL=http://gateway:8001
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:5173"
+    command: npm run dev -- --host
+    depends_on:
+      - notificaciones
+    environment:
+      - VITE_API_URL=http://localhost:4000
+
 volumes:
   postgres_data:
   mongo_data:
